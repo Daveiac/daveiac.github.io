@@ -1,0 +1,14 @@
+body {
+    padding: 20px;
+}
+
+#slamSlider, #superSlider, #slashSlider, #comboSlider {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#mainTable {
+    margin: auto;
+    width: 100%;
+    max-width: 400;
+}

@@ -1,0 +1,129 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crota damage calculator</title>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script>
+        var enrageLimit = 1800000;
+        var killLimit = 2270000;
+        var vfModifiers = [];
+        for (i = 0; i <= 3; i++) {
+            vfModifiers[i] = 1 + i * 0.05;
+        }
+        var wolModifier = 1.35;
+        $(function () {
+            var total = $("#total");
+            var wol = $("#wol");
+            var vf = $("#vf");
+            var enrage = $("#enrage");
+            var kill = $("#kill");
+            var numbers = [];
+            var damageNumbers = [];
+            wol.on("change", calculateDamage);
+            vf.on("change", calculateDamage);
+            addMethod($("#slashSlider"), $("#slashNumber"), 70403);
+            addMethod($("#slamSlider"), $("#slamNumber"), 149605);
+            addMethod($("#superSlider"), $("#superNumber"), 176006);
+            addMethod($("#comboSlider"), $("#comboNumber"), 264010);
+            function addMethod(slider, number, damage) {
+                numbers.push(number)
+                damageNumbers.push(damage);
+                slider.slider({
+                    min: 0,
+                    max: 16
+                });
+                slider.on("slide", function (e, ui) {
+                    var step = ui.value;
+                    number.val(step)
+                    calculateDamage();
+                })
+            }
+            function calculateDamage() {
+                var wolMultiplier = (wol.is(":checked")) ? wolModifier : 1;
+                var vfMultiplier = vfModifiers[vf.val()];
+                var sum = 0;
+                for (i = 0; i < numbers.length; i++) {
+                    var count = parseInt(numbers[i].val());
+                    sum += count * damageNumbers[i] * wolMultiplier * vfMultiplier;
+                }
+                enrage.prop("checked", sum >= enrageLimit);
+                kill.prop("checked", sum >= killLimit);
+                total.val(Math.round(sum).toLocaleString())
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <table id="mainTable">
+        <tr>
+            <td> <input type="checkbox" id="wol"> Weapons of light </td>
+        </tr>
+        <tr>
+            <td>
+                <select id="vf">
+                    <option value=0>0</option>
+                    <option value=1>1</option>
+                    <option value=2>2</option>
+                    <option value=3>3</option>
+                </select> Viking funeral stacks </td>
+            </td>
+        </tr>
+        <tr>
+            <td> Slashes </td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <div id="slashSlider"></div>
+            </td>
+            <td> <input id="slashNumber" size=1 maxlength=1 type="text" value="0">
+            </td>
+        </tr>
+        <tr>
+            <td> Slams </td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <div id="slamSlider"></div>
+            </td>
+            <td> <input id="slamNumber" size=1 maxlength=1 type="text" value="0">
+            </td>
+        </tr>
+        <tr>
+            <td> Super slams </td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <div id="superSlider"></div>
+            </td>
+            <td> <input id="superNumber" size=1 maxlength=1 type="text" value="0">
+            </td>
+        </tr>
+        <tr>
+            <td> Combos (slash, slash, uppercut) </td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <div id="comboSlider"></div>
+            </td>
+            <td> <input id="comboNumber" size=1 maxlength=1 type="text" value="0">
+            </td>
+        </tr>
+        <tr>
+            <td> Total damage:
+                <input id="total" type="text" value="0" size="10" readonly> 
+                Enrage:
+                <input id="enrage" type="checkbox" onclick="return false;"> 
+                Kill:
+                <input id="kill" type="checkbox" onclick="return false;">
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
